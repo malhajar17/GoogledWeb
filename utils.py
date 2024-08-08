@@ -13,6 +13,8 @@ from langchain_core.tools import Tool
 from langchain.agents import initialize_agent
 from langchain_groq import ChatGroq
 import json
+import shutil
+import glob
 
 
 with open('keys.json', 'r') as file:
@@ -47,8 +49,8 @@ def call_groq(raw_prompt, temperature=0):
             )
             return chat_completion.choices[0].message.content
         except:
-            print("Rate limite exceeded, sleeping for 5 seconds")
-            time.sleep(5)
+            print("Rate limite exceeded, sleeping for 60 seconds")
+            time.sleep(60)
             attempt += 1
     print("Failed to generate!")
     return None
@@ -195,10 +197,10 @@ def search_for_query(query, llm=None, k=3):
             # search_engine.reset_all_resources()
             return res, sources 
         except:
-            print("Failed to generate, sleeping for 10 seconds")
-            time.sleep(10)
+            print("Failed to generate, sleeping for 60 seconds")
+            time.sleep(60)
             attempt += 1
-    return None, None
+    return "", []
 
 def search_for_all_queries(instruction_df, original_query):
     llm = ChatGroq(temperature=0, model_name="llama3-8b-8192")
@@ -207,6 +209,29 @@ def search_for_all_queries(instruction_df, original_query):
     all_instructions = list(instruction_df["instruction"])
     for i in tqdm(range(len(instruction_df))):
         res, sources = search_for_query(all_instructions[i], llm)
-        if res != None:
+        if res != None and len(res) > 0 and "action_input" not in res:
             completed_df.loc[len(completed_df) + 1] = [all_contexts[i], all_instructions[i], res, sources, original_query]
     return completed_df
+
+# some utils
+def delete_all_contents(folder_path):
+    if not os.path.exists(folder_path):
+        print(f"The folder {folder_path} does not exist.")
+        return
+    for item in os.listdir(folder_path):
+        item_path = os.path.join(folder_path, item)
+        if os.path.isfile(item_path) or os.path.islink(item_path):
+            os.unlink(item_path)  
+        elif os.path.isdir(item_path):
+            shutil.rmtree(item_path)  
+    print(f"All contents of the folder {folder_path} have been deleted.")
+
+def delete_files_with_prefix(folder_path, prefix):
+    pattern = os.path.join(folder_path, f"{prefix}*")
+    files_to_delete = glob.glob(pattern)
+    for file_path in files_to_delete:
+        try:
+            os.remove(file_path)
+            print(f"Deleted file: {file_path}")
+        except Exception as e:
+            print(f"Error deleting file {file_path}: {e}")

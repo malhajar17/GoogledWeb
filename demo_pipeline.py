@@ -2,6 +2,10 @@ from utils import *
 import argparse
 from datetime import datetime 
 
+# code to create demo dataset 
+# queries I will try: finance, politics, computer engineering, art, education
+# for each of them, retrieve top 50 contexts and filter them; then for each attempt to generate 5 questions and answer
+
 if __name__ == "__main__":
     # try for queries: [finance, politics, computer engineering, art, education]
     parser = argparse.ArgumentParser()
