@@ -167,6 +167,7 @@ class CustomGoogleSearchWrapper:
     def top_k_results(self, query):
         res = self.search.results(query, self.k)
         results = " ".join([r["snippet"] for r in res])
+        res = [r for r in res if "snippet" in r]
         sources = [r["link"] for r in res]
         self.all_resources.extend(sources)
         return {"search_results" : results, "sources" : sources}
@@ -185,11 +186,19 @@ def search_for_query(query, llm=None, k=3):
         func=search_engine.top_k_results,
     )
     tools = [meta_data_search_tool]
-    agent = initialize_agent(tools, llm, agent="chat-zero-shot-react-description", verbose=True)
-    res = agent.run(query)
-    sources = search_engine.get_all_resources()
-    # search_engine.reset_all_resources()
-    return res, sources 
+    agent = initialize_agent(tools, llm, agent="chat-zero-shot-react-description", verbose=False)
+    attempt = 0
+    while attempt < 5:
+        try:
+            res = agent.run(query)
+            sources = search_engine.get_all_resources()
+            # search_engine.reset_all_resources()
+            return res, sources 
+        except:
+            print("Failed to generate, sleeping for 10 seconds")
+            time.sleep(10)
+            attempt += 1
+    return None, None
 
 def search_for_all_queries(instruction_df, original_query):
     llm = ChatGroq(temperature=0, model_name="llama3-8b-8192")
@@ -198,5 +207,6 @@ def search_for_all_queries(instruction_df, original_query):
     all_instructions = list(instruction_df["instruction"])
     for i in tqdm(range(len(instruction_df))):
         res, sources = search_for_query(all_instructions[i], llm)
-        completed_df.loc[len(completed_df) + 1] = [all_contexts[i], all_instructions[i], res, sources, original_query]
+        if res != None:
+            completed_df.loc[len(completed_df) + 1] = [all_contexts[i], all_instructions[i], res, sources, original_query]
     return completed_df

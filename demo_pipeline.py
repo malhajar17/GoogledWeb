@@ -25,7 +25,11 @@ if __name__ == "__main__":
 
     # generate instructions
     print("generating instructions...")
-    all_q = gen_m_q_for_n_context(remaining_texts, args.num_instructs, n1=20, n2=20, max_attempt=5)
+    if os.path.exists(f"demo_data/{args.query}_all_q.csv"):
+        all_q = pd.read_csv(f"demo_data/{args.query}_all_q.csv")
+    else:
+        all_q = gen_m_q_for_n_context(remaining_texts, args.num_instructs, n1=20, n2=20, max_attempt=5)
+        all_q.to_csv(f"demo_data/{args.query}_all_q.csv", index=False)
     print(f"number of instructions generated: {len(all_q)}")
 
     # generate answer
@@ -36,7 +40,7 @@ if __name__ == "__main__":
     # save result
     print("saving...")
     current_timestamp = datetime.now()
-    completed_df.to_csv(f"{args.query}_{current_timestamp}.csv", index=False)
+    completed_df.to_csv(f"demo_result/{args.query}_{current_timestamp}.csv", index=False)
 
     
 
