@@ -14,6 +14,7 @@ from langchain.agents import initialize_agent
 from langchain_groq import ChatGroq
 import json
 
+
 with open('keys.json', 'r') as file:
     api_keys = json.load(file)
 
@@ -110,6 +111,7 @@ def get_texts_by_query(query, num_texts=100, retriever=None):
     for i in range(len(evaluate_result)):
         if evaluate_result[i] == True:
             remaining_texts.append(texts[i])
+    return remaining_texts
 
 
 # These functions are used for genq process
@@ -189,13 +191,12 @@ def search_for_query(query, llm=None, k=3):
     # search_engine.reset_all_resources()
     return res, sources 
 
-def search_for_all_queries(instruction_df):
+def search_for_all_queries(instruction_df, original_query):
     llm = ChatGroq(temperature=0, model_name="llama3-8b-8192")
-    completed_df = pd.DataFrame(columns = ["original_context", "instruction", "response", "sources"])
+    completed_df = pd.DataFrame(columns = ["original_context", "instruction", "response", "sources", "original_query"])
     all_contexts = list(instruction_df["text"])
     all_instructions = list(instruction_df["instruction"])
     for i in tqdm(range(len(instruction_df))):
         res, sources = search_for_query(all_instructions[i], llm)
-        completed_df.loc[len(completed_df) + 1] = [all_contexts[i], all_instructions[i], res, sources]
+        completed_df.loc[len(completed_df) + 1] = [all_contexts[i], all_instructions[i], res, sources, original_query]
     return completed_df
-
