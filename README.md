@@ -3,7 +3,7 @@
 ### What is it
 - This is our project for NexaAI Hackathon.
 - By using GenQA technique in this [paper](https://arxiv.org/pdf/2406.10323), and LLM agent powered by groq and Langchain, we enable generation of up-to-date instruction data for finetuning, base on user input query
-- Base dataset of generation of [fineweb-edu](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu). Since this is only a demo, we create vector database using JinaEmbedding with only the top 10k rows from fineweb-edu 2024-10 snapshot.
+- Base dataset of generation is [fineweb-edu](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu). Since this is only a demo, we create vector database using JinaEmbedding with only the top 10k rows from fineweb-edu 2024-10 snapshot.
 
 ### To use the demo
 - create an environment with python version 3.11.3
