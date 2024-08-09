@@ -1,6 +1,6 @@
 # /new-user: user-id, json file for each step  
-# step 1: retrieve 30 documents & fileter by LLM evaluation, and provide top 10 documents of relevant documents
-# step 2: Generating Q for 25, each generate 1 question, demonstrate top 10 instructions generated
+# step 1: retrieve 30 documents & fileter by LLM evaluation, and provide top 10 documents of relevant documents, provide statistics
+# step 2: Generating Q for 25, each generate 1 question, demonstrate top 10 instructions generated, provide statistics
 # step 3: sending the question pairs to agent for answering the Q queries, demonstrate the top 10 answers generated. 
 # parse the dataframe to json and send to front end. 
 
@@ -27,7 +27,7 @@ def new_user_route():
     """
     try:
         current_timestamp = datetime.now()
-        user_id = f"user_{current_timestamp}"
+        user_id = current_timestamp
         user_info[user_id] = {
             "user_id": user_id,
             "query": None,
@@ -115,10 +115,13 @@ def retrieve_and_filter_route():
             return jsonify({'error message': 'query not submitted'}), 400
         
         remaining_texts = get_texts_by_query(user_info[user_id]['query'], 25)
+        stat_dict = {
+            "len_contexts": len(remaining_texts)
+        }
         with open(f"user_data/{user_id}_contexts.pkl", "wb") as file:
             pickle.dump(remaining_texts, file)
         user_info[user_id]["is_finished_retrieve_and_filter"] = True
-        return jsonify({'user_info': user_info[user_id], 'contexts': remaining_texts}), 200
+        return jsonify({'user_info': user_info[user_id], 'contexts': remaining_texts, 'stats': stat_dict}), 200
     except Exception as e:
         print(e)
         return jsonify("something went wrong"), 400
@@ -140,13 +143,17 @@ def gen_q_route():
         with open(f"user_data/{user_id}_contexts.pkl", "rb") as file:
             remaining_texts = pickle.load(file)
         all_q = gen_m_q_for_n_context(remaining_texts, 1, n1=20, n2=20, max_attempt=5)
+        stat_dict = {
+            "len_input_context": len(remaining_texts),
+            "len_generated": len(all_q)
+        }
         all_q.to_csv(f"user_data/{user_id}_all_q.csv", index=False)
         user_info[user_id]["is_finished_gen_q"] = True
         if len(all_q) > 10:
             top_10 = all_q[:10]
         else:
             top_10 = all_q
-        return jsonify({'user_info': user_info[user_id], 'top_10': top_10.to_dict()}), 200
+        return jsonify({'user_info': user_info[user_id], 'top_10': top_10.to_dict(), 'stats' : stat_dict}), 200
     except Exception as e:
         print(e)
         return jsonify("something went wrong"), 400
@@ -171,12 +178,16 @@ def gen_a_route():
         all_q = pd.read_csv(f"user_data/{user_id}_all_q.csv")
         completed_df = search_for_all_queries(all_q, user_info[user_id]["query"])
         completed_df.to_csv(f"user_data/{user_id}_completed_df.csv", index=False)
+        stat_dict = {
+            "len_input_instructions": len(all_q),
+            "len_response_generated": len(completed_df)
+        }
         if len(completed_df) > 10:
             top_10 = completed_df[:10]
         else:
             top_10 = completed_df
         user_info[user_id]["is_finished_gen_a"] = True
-        return jsonify({'user_info': user_info[user_id], 'top_10': top_10.to_dict()}), 200
+        return jsonify({'user_info': user_info[user_id], 'top_10': top_10.to_dict(), 'stats': stat_dict}), 200
     except Exception as e:
         print(e)
         return jsonify("something went wrong"), 400
@@ -200,7 +211,10 @@ def gen_complete_result_route():
         if not user_info[user_id]["is_finished_gen_a"]:
             return jsonify({'error message': 'completed result not found'}), 400
         completed_df = pd.read_csv(f"user_data/{user_id}_completed_df.csv")
-        return jsonify({'user_info': user_info[user_id], 'completion': completed_df.to_dict()}), 200
+        stat_dict = {
+            "len_results": len(completed_df),
+        }
+        return jsonify({'user_info': user_info[user_id], 'completion': completed_df.to_dict(), 'stats': stat_dict}), 200
     except Exception as e:
         print(e)
         return jsonify("something went wrong"), 400
