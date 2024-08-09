@@ -8,7 +8,6 @@ from flask import Flask, request, jsonify
 from utils import *
 import pickle
 import os 
-import shutil
 from datetime import datetime
 
 app = Flask(__name__)
