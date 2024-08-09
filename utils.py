@@ -209,7 +209,7 @@ def search_for_all_queries(instruction_df, original_query):
     all_instructions = list(instruction_df["instruction"])
     for i in tqdm(range(len(instruction_df))):
         res, sources = search_for_query(all_instructions[i], llm)
-        if res != None and len(res) > 0 and "action_input" not in res:
+        if res != None and len(res) >= 80 and "action_input" not in res:
             completed_df.loc[len(completed_df) + 1] = [all_contexts[i], all_instructions[i], res, sources, original_query]
     return completed_df
 
