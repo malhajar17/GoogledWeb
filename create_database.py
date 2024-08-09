@@ -42,7 +42,7 @@ texts = list(pd.read_csv("data/fineweb_edu_2024_10_subset.csv")["text"])
 
 documents = text_splitter.create_documents(texts = texts)
 
-persist_directory = 'fineweb_db'
+persist_directory = 'fineweb_db_new'
 
 vectordb = Chroma.from_documents(documents=documents,
                                  embedding=embeddings,

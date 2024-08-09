@@ -101,7 +101,7 @@ def evaluate_context(query, context):
 def get_texts_by_query(query, num_texts=100, retriever=None):
     if retriever == None:
         embeddings = CustomJinaEmbeddings()
-        vectordb = Chroma(persist_directory="fineweb_db", embedding_function=embeddings)
+        vectordb = Chroma(persist_directory="fineweb_db_new", embedding_function=embeddings)
         retriever = vectordb.as_retriever(search_kwargs={"k": num_texts})
     description = call_groq(f"Elaborate on this: {query}.")
     docs = retriever.get_relevant_documents(description)
