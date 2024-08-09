@@ -210,6 +210,8 @@ def search_for_all_queries(instruction_df, original_query):
     for i in tqdm(range(len(instruction_df))):
         res, sources = search_for_query(all_instructions[i], llm)
         if res != None and len(res) >= 80 and "action_input" not in res:
+            if "The final answer to the question is: " in res and res.index("The final answer to the question is: ") == 0:
+                res = res[len("The final answer to the question is: "):]
             completed_df.loc[len(completed_df) + 1] = [all_contexts[i], all_instructions[i], res, sources, original_query]
     return completed_df
 
