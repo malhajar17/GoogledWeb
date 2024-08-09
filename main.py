@@ -221,5 +221,6 @@ def reset_user_after_completion_route():
         return jsonify({'error message': e}), 400
 
 if __name__ == '__main__':
+    os.makedirs("user_data", exist_ok=True)
     delete_all_contents("user_data")
     app.run(host='0.0.0.0', port=8000, debug=True)
