@@ -146,7 +146,7 @@ def gen_q_route():
             top_10 = all_q[:10]
         else:
             top_10 = all_q
-        return jsonify({'user_info': user_info[user_id], 'top_10': top_10.to_dict(index=False)}), 200
+        return jsonify({'user_info': user_info[user_id], 'top_10': top_10.to_dict()}), 200
     except Exception as e:
         print(e)
         return jsonify("something went wrong"), 400
@@ -176,7 +176,7 @@ def gen_a_route():
         else:
             top_10 = completed_df
         user_info[user_id]["is_finished_gen_a"] = True
-        return jsonify({'user_info': user_info[user_id], 'top_10': top_10}), 200
+        return jsonify({'user_info': user_info[user_id], 'top_10': top_10.to_dict()}), 200
     except Exception as e:
         print(e)
         return jsonify("something went wrong"), 400
@@ -200,7 +200,7 @@ def gen_complete_result_route():
         if not user_info[user_id]["is_finished_gen_a"]:
             return jsonify({'error message': 'completed result not found'}), 400
         completed_df = pd.read_csv(f"user_data/{user_id}_completed_df.csv")
-        return jsonify({'user_info': user_info[user_id], 'completion': completed_df.to_dict(index=False)}), 200
+        return jsonify({'user_info': user_info[user_id], 'completion': completed_df.to_dict()}), 200
     except Exception as e:
         print(e)
         return jsonify("something went wrong"), 400
