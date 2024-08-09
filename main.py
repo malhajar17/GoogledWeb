@@ -38,7 +38,7 @@ def new_user_route():
         }
         return jsonify({'user_info': user_info[user_id]}), 200
     except Exception as e:
-        return jsonify({'error message': e}), 400
+        return jsonify("something went wrong"), 400
 
 @app.route('/delete-user', methods=['POST'])
 def delete_user_route():
@@ -53,7 +53,8 @@ def delete_user_route():
         delete_files_with_prefix("user_data", user_id)
         return jsonify({'user_info': user_info}), 200
     except Exception as e:
-        return jsonify({'error message': e}), 400
+        print(e)
+        return jsonify("something went wrong"), 400
 
 @app.route('/get-all-user-info', methods=['GET'])
 def get_all_user_info_route():
@@ -63,7 +64,8 @@ def get_all_user_info_route():
     try:
         return jsonify({'user_info': user_info}), 200
     except Exception as e:
-        return jsonify({'error message': e}), 400
+        print(e)
+        return jsonify("something went wrong"), 400
 
 @app.route('/get-user-info', methods=['GET'])
 def get_user_info_route():
@@ -76,7 +78,8 @@ def get_user_info_route():
             return jsonify({'error message': 'user not found'}), 400
         return jsonify({'user_info': user_info[user_id]}), 200
     except Exception as e:
-        return jsonify({'error message': e}), 400
+        print(e)
+        return jsonify("something went wrong"), 400
 
 @app.route('/submit-query', methods=['POST'])
 def submit_query_route():
@@ -90,11 +93,12 @@ def submit_query_route():
         query = request.json.get("query")
         if query == None or len(query) == 0:
             return jsonify({'error message': 'Query should not be empty'}), 400
-        user_info[user_id] = query 
+        user_info[user_id]["query"] = query 
         user_info[user_id]["is_finished_submit_query"] = True
         return jsonify({'user_info': user_info[user_id]}), 200
     except Exception as e:
-        return jsonify({'error message': e}), 400
+        print(e)
+        return jsonify("something went wrong"), 400
 
 @app.route('/retrieve-and-filter', methods=['POST'])
 def retrieve_and_filter_route():
@@ -116,7 +120,8 @@ def retrieve_and_filter_route():
         user_info[user_id]["is_finished_retrieve_and_filter"] = True
         return jsonify({'user_info': user_info[user_id], 'contexts': remaining_texts}), 200
     except Exception as e:
-        return jsonify({'error message': e}), 400
+        print(e)
+        return jsonify("something went wrong"), 400
 
 @app.route('/gen-q', methods=['POST'])
 def gen_q_route():
@@ -143,7 +148,8 @@ def gen_q_route():
             top_10 = all_q
         return jsonify({'user_info': user_info[user_id], 'top_10': top_10.to_dict(index=False)}), 200
     except Exception as e:
-        return jsonify({'error message': e}), 400
+        print(e)
+        return jsonify("something went wrong"), 400
 
 
 @app.route('/gen-a', methods=['POST'])
@@ -172,7 +178,8 @@ def gen_a_route():
         user_info[user_id]["is_finished_gen_a"] = True
         return jsonify({'user_info': user_info[user_id], 'top_10': top_10}), 200
     except Exception as e:
-        return jsonify({'error message': e}), 400
+        print(e)
+        return jsonify("something went wrong"), 400
 
 @app.route('/get-complete-result', methods=['GET'])
 def gen_complete_result_route():
@@ -195,7 +202,8 @@ def gen_complete_result_route():
         completed_df = pd.read_csv(f"user_data/{user_id}_completed_df.csv")
         return jsonify({'user_info': user_info[user_id], 'completion': completed_df.to_dict(index=False)}), 200
     except Exception as e:
-        return jsonify({'error message': e}), 400
+        print(e)
+        return jsonify("something went wrong"), 400
     
 @app.route('/reset-user-after-completion', methods=['POST'])
 def reset_user_after_completion_route():
@@ -217,7 +225,8 @@ def reset_user_after_completion_route():
         }
         return jsonify({'user_info': user_info[user_id]}), 200
     except Exception as e:
-        return jsonify({'error message': e}), 400
+        print(e)
+        return jsonify("something went wrong"), 400
 
 if __name__ == '__main__':
     os.makedirs("user_data", exist_ok=True)
