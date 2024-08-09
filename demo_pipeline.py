@@ -29,6 +29,7 @@ if __name__ == "__main__":
 
     # generate instructions
     print("generating instructions...")
+    os.makedirs(f"{args.output_dir}_data", exist_ok=True)
     if os.path.exists(f"{args.output_dir}_data/{args.query}_all_q.csv"):
         all_q = pd.read_csv(f"{args.output_dir}_data/{args.query}_all_q.csv")
     else:
@@ -43,6 +44,7 @@ if __name__ == "__main__":
 
     # save result
     print("saving...")
+    os.makedirs(args.output_dir, exist_ok=True)
     current_timestamp = datetime.now()
     completed_df.to_csv(f"{args.output_dir}/{args.query}_{current_timestamp}.csv", index=False)
 
