@@ -26,8 +26,12 @@ def new_user_route():
     returns the information dict of new user
     """
     try:
-        current_timestamp = str(datetime.now())
-        user_id = current_timestamp
+        # Get the current timestamp
+        timestamp = datetime.now()
+
+        # Format the timestamp as a number
+        timestamp_number = timestamp.strftime("%Y%m%d%H%M%S")
+        user_id = timestamp_number
         user_info[user_id] = {
             "user_id": user_id,
             "query": None,

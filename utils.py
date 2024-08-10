@@ -140,7 +140,8 @@ def genq_by_context(context, n1=20, n2=20, max_attempt=5):
     while attempt < max_attempt:
         response = call_groq(genq_prompt, temperature=0.8)
         genq_result = parse_res("Question:", response)
-        if genq_result != None:
+        if genq_result != None and "?" in genq_result:
+            genq_result = genq_result[:genq_result.index("?") + 1]
             return genq_result 
         attempt += 1
     return None 
@@ -192,7 +193,7 @@ def search_for_query(query, llm=None, k=10):
         tools,
         llm,
         agent="chat-zero-shot-react-description",
-        verbose=True,
+        verbose=False,
         agent_kwargs={
             "max_execution_time": 3000,
             "llm_prefix": (
@@ -203,7 +204,7 @@ def search_for_query(query, llm=None, k=10):
     attempt = 0
     while attempt < 5:
         try:
-            res = agent.run(f"{query}. Please provide multiple perspectives and a detailed breakdown.")
+            res = agent.run(f"{query}. Please provide multiple perspectives and a detailed breakdown. **Don't mention that it is a search result in your response.**")
             sources = search_engine.get_all_resources()
             # search_engine.reset_all_resources()
             return res, sources 
