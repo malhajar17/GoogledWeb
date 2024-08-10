@@ -125,7 +125,6 @@ if st.button("Submit"):
                         st.markdown(f"<h4>Step 4: Using AI to Answer Questions</h4>", unsafe_allow_html=True)
                         st.info("Using AI agents to answer the previously generated complex queries...")
                         gen_a_response = gen_a(user_id)
-                        print(gen_a_response)
                         if "error" in gen_a_response:
                             st.error(gen_a_response["error"])
                         else:
