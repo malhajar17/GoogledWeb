@@ -1,0 +1,51 @@
+/* styles.css */
+
+/* Footer styling */
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #f1f1f1;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    color: #000;
+}
+
+/* Custom styling for headers */
+h1, h2, h3, h4, h5, h6 {
+    color: #4CAF50; /* Change header color */
+}
+
+/* Style for buttons */
+.stButton>button {
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+}
+
+.stButton>button:hover {
+    background-color: #45a049;
+}
+
+/* Style for dataframes */
+.dataframe {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 10px 0;
+}
+
+/* Style for text inputs */
+.stTextInput>div>input {
+    border: 1px solid #4CAF50;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Style for the spinner */
+.stSpinner>div>div {
+    border-top-color: #4CAF50;
+}
