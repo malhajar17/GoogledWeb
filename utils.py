@@ -140,7 +140,8 @@ def genq_by_context(context, n1=20, n2=20, max_attempt=5):
     while attempt < max_attempt:
         response = call_groq(genq_prompt, temperature=0.8)
         genq_result = parse_res("Question:", response)
-        if genq_result != None:
+        if genq_result != None and "?" in genq_result:
+            genq_result = genq_result[:genq_result.index("?") + 1]
             return genq_result 
         attempt += 1
     return None 
@@ -178,9 +179,9 @@ class CustomGoogleSearchWrapper:
     def reset_all_resources(self):
         self.all_resources = []
 
-def search_for_query(query, llm=None, k=3):
+def search_for_query(query, llm=None, k=10):
     if llm == None:
-        llm = ChatGroq(temperature=0, model_name="llama3-8b-8192")
+        llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", max_tokens=8192)
     search_engine = CustomGoogleSearchWrapper(k)
     meta_data_search_tool = Tool(
         name="Google Search Snippets",
@@ -188,11 +189,22 @@ def search_for_query(query, llm=None, k=3):
         func=search_engine.top_k_results,
     )
     tools = [meta_data_search_tool]
-    agent = initialize_agent(tools, llm, agent="chat-zero-shot-react-description", verbose=False)
+    agent = initialize_agent(
+        tools,
+        llm,
+        agent="chat-zero-shot-react-description",
+        verbose=False,
+        agent_kwargs={
+            "max_execution_time": 3000,
+            "llm_prefix": (
+                "Provide a comprehensive analysis of the information gathered, covering all relevant aspects in depth. Then, respond in detail to the query."
+            )
+        }
+    )
     attempt = 0
     while attempt < 5:
         try:
-            res = agent.run(query)
+            res = agent.run(f"{query}. Please provide multiple perspectives and a detailed breakdown. **Don't mention that it is a search result in your response.**")
             sources = search_engine.get_all_resources()
             # search_engine.reset_all_resources()
             return res, sources 
@@ -203,7 +215,7 @@ def search_for_query(query, llm=None, k=3):
     return "", []
 
 def search_for_all_queries(instruction_df, original_query):
-    llm = ChatGroq(temperature=0, model_name="llama3-8b-8192")
+    llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", max_tokens=8192)
     completed_df = pd.DataFrame(columns = ["original_context", "instruction", "response", "sources", "original_query"])
     all_contexts = list(instruction_df["text"])
     all_instructions = list(instruction_df["instruction"])

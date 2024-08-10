@@ -11,7 +11,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--query", type=str, help="user query")
     parser.add_argument("--num_texts", type=int, help="number of contexts to query from database")
-    parser.add_argument("--num_instructs", type=int,help="number of instructions generated for each context")
+    parser.add_argument("--num_instructs", type=int, help="number of instructions generated for each context")
     parser.add_argument("--output_dir", type=str, help="directory to store output", default="demo_result")
 
     args = parser.parse_args()
