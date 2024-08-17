@@ -2,7 +2,7 @@
 
 import requests
 
-BASE_URL = "http://68.154.41.143:8000"
+BASE_URL = "http://18.212.86.14:8000"
 
 def register_new_user():
     try:
