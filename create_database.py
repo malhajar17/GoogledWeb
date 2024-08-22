@@ -5,7 +5,7 @@ from utils import *
 import pandas as pd 
 import os
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_chroma import Chroma
+from langchain_community.vectorstores.chroma import Chroma
 
 with open('keys.json', 'r') as file:
     api_keys = json.load(file)
@@ -38,12 +38,34 @@ text_splitter = RecursiveCharacterTextSplitter(
 )
 
 
-texts = list(pd.read_csv("data/fineweb_edu_2024_10_subset.csv")["text"])
+# original code for creating smaller scaled database
+# texts = list(pd.read_csv("data/fineweb_edu_2024_10_subset_30k.csv")["text"])
+
+# documents = text_splitter.create_documents(texts = texts)
+
+# persist_directory = 'fineweb_db_new_30k'
+
+# vectordb = Chroma.from_documents(documents=documents,
+#                                  embedding=embeddings,
+#                                  persist_directory=persist_directory)
+
+# creating larger scaled database, use split docs to overcome chroma database batch limit
+texts = list(pd.read_csv("data/fineweb_edu_2024_10_subset_100k.csv")["text"])
 
 documents = text_splitter.create_documents(texts = texts)
 
-persist_directory = 'fineweb_db_new'
+persist_directory = 'fineweb_db_new_100k'
 
-vectordb = Chroma.from_documents(documents=documents,
-                                 embedding=embeddings,
-                                 persist_directory=persist_directory)
+def split_list(input_list, chunk_size):
+    for i in range(0, len(input_list), chunk_size):
+        yield input_list[i:i + chunk_size]
+        
+split_docs_chunked = split_list(documents, 41000)
+
+for split_docs_chunk in split_docs_chunked:
+    vectordb = Chroma.from_documents(
+        documents=split_docs_chunk,
+        embedding=embeddings,
+        persist_directory=persist_directory,
+    )
+    vectordb.persist()

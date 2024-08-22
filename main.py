@@ -199,13 +199,17 @@ def gen_a_route():
 @app.route('/get-complete-result', methods=['GET'])
 def gen_complete_result_route():
     """
-    update user info, store the contexts a user generate with the query, returns user info of user_id
+    Retrieve the complete result for a user after all steps are finished.
     """
     try:
-        user_id = request.json.get("user_id")
-        # previous steps must be completed
+        # Get user_id from the query parameters in the GET request
+        user_id = request.args.get("user_id")
+        if not user_id:
+            return jsonify({'error message': 'user_id is missing'}), 400
+        
         if user_id not in user_info:
             return jsonify({'error message': 'user not found'}), 400
+        
         if not user_info[user_id]["is_finished_submit_query"]:
             return jsonify({'error message': 'query not submitted'}), 400
         if not user_info[user_id]["is_finished_retrieve_and_filter"]:
@@ -214,13 +218,14 @@ def gen_complete_result_route():
             return jsonify({'error message': 'instructions not found'}), 400
         if not user_info[user_id]["is_finished_gen_a"]:
             return jsonify({'error message': 'completed result not found'}), 400
+        
         completed_df = pd.read_csv(f"user_data/{user_id}_completed_df.csv")
         stat_dict = {
             "len_results": len(completed_df),
         }
         return jsonify({'user_info': user_info[user_id], 'completion': completed_df.to_dict(), 'stats': stat_dict}), 200
     except Exception as e:
-        print(e)
+        print(f"Error processing request for user_id {user_id}: {e}")
         return jsonify("something went wrong"), 400
     
 @app.route('/reset-user-after-completion', methods=['POST'])

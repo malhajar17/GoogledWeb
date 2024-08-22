@@ -73,6 +73,7 @@ class CustomJinaEmbeddings:
                 page_contents.append(texts[j])
             if len(page_contents) > 0:
                 embeddings.extend(embedding_func.embed_documents(page_contents))
+            time.sleep(30)
         return embeddings 
     def embed_query(self, text: str) -> List[float]:
         return self.embedding_func.embed_query(text)
