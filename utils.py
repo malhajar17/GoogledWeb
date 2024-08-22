@@ -62,7 +62,8 @@ class CustomJinaEmbeddings:
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         embedding_func = JinaEmbeddings(model_name="jina-embeddings-v2-base-en")
-        batch_size = 2048
+        # smaller batch to avoid limit error
+        batch_size = 1024
         embeddings = []
         n = len(texts)
         for i in tqdm(range(0, n, batch_size)):
@@ -73,7 +74,8 @@ class CustomJinaEmbeddings:
                 page_contents.append(texts[j])
             if len(page_contents) > 0:
                 embeddings.extend(embedding_func.embed_documents(page_contents))
-            time.sleep(30)
+            # sleeping time to avoid lmit error
+            time.sleep(60)
         return embeddings 
     def embed_query(self, text: str) -> List[float]:
         return self.embedding_func.embed_query(text)
@@ -102,7 +104,7 @@ def evaluate_context(query, context):
 def get_texts_by_query(query, num_texts=100, retriever=None):
     if retriever == None:
         embeddings = CustomJinaEmbeddings()
-        vectordb = Chroma(persist_directory="fineweb_db_new", embedding_function=embeddings)
+        vectordb = Chroma(persist_directory="fineweb_db_new_50k", embedding_function=embeddings)
         retriever = vectordb.as_retriever(search_kwargs={"k": num_texts})
     description = call_groq(f"Elaborate on this: {query}.")
     docs = retriever.get_relevant_documents(description)

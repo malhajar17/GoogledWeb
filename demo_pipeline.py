@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # initialize retriever
     print("initializing retriever...")
     embeddings = CustomJinaEmbeddings()
-    vectordb = Chroma(persist_directory="fineweb_db_new", embedding_function=embeddings)
+    vectordb = Chroma(persist_directory="fineweb_db_new_50k", embedding_function=embeddings)
     retriever = vectordb.as_retriever(search_kwargs={"k": args.num_texts})
 
     # retrieve num_texts documents and filter

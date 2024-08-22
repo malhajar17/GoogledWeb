@@ -50,11 +50,11 @@ text_splitter = RecursiveCharacterTextSplitter(
 #                                  persist_directory=persist_directory)
 
 # creating larger scaled database, use split docs to overcome chroma database batch limit
-texts = list(pd.read_csv("data/fineweb_edu_2024_10_subset_100k.csv")["text"])
+texts = list(pd.read_csv("data/fineweb_edu_2024_10_subset_50k.csv")["text"])
 
 documents = text_splitter.create_documents(texts = texts)
 
-persist_directory = 'fineweb_db_new_100k'
+persist_directory = 'fineweb_db_new_50k'
 
 def split_list(input_list, chunk_size):
     for i in range(0, len(input_list), chunk_size):
