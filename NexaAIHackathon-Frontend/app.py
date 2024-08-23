@@ -61,10 +61,10 @@ if "complete_results" not in st.session_state:
 st.markdown(f"""
 <div style='text-align: center;'>
     <h3>Welcome to the Query Processing Pipeline!</h3>
-    <p>Our advanced system will guide you through the following steps to process your finance-related query:</p>
+    <p>Our advanced system will guide you through the following steps to process your query:</p>
     <ol style='text-align: left; display: inline-block;'>
-        <li><strong>Query Input</strong>: Enter your finance-related query to get started.</li>
-        <li><strong>Search FineDweb</strong>: We search the 1T FineDWeb dataset to find relevant contexts.</li>
+        <li><strong>Query Input</strong>: Enter your query to get started.</li>
+        <li><strong>Search FineWeb</strong>: We search the 50k FineWeb dataset to find relevant contexts.</li>
         <li><strong>Generate Questions</strong>: Extract subjects and generate questions from the contexts using state-of-the-art GENQA approach.</li>
         <li><strong>Search Google</strong>: AI agents answer the complex questions generated.</li>
         <li><strong>View and Download</strong>: Display the final results and download them in multiple formats.</li>
@@ -72,7 +72,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-user_query = st.text_input("Enter your finance-related query:", placeholder="e.g., What are the top financial trends for 2024?")
+user_query = st.text_input("Enter your query:", placeholder="e.g., Tell me about knowledge related to medicine")
 
 if st.button("Submit"):
     if user_query:

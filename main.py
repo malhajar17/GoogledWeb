@@ -118,7 +118,7 @@ def retrieve_and_filter_route():
         if not user_info[user_id]["is_finished_submit_query"]:
             return jsonify({'error message': 'query not submitted'}), 400
         
-        remaining_texts = get_texts_by_query(user_info[user_id]['query'], 5)
+        remaining_texts = get_texts_by_query(user_info[user_id]['query'], 8)
         print(len(remaining_texts))
         stat_dict = {
             "len_contexts": len(remaining_texts)
@@ -147,7 +147,7 @@ def gen_q_route():
             return jsonify({'error message': 'contexts not found'}), 400
         with open(f"user_data/{user_id}_contexts.pkl", "rb") as file:
             remaining_texts = pickle.load(file)
-        all_q = gen_m_q_for_n_context(remaining_texts, 1, n1=20, n2=20, max_attempt=5)
+        all_q = gen_m_q_for_n_context(remaining_texts, 1, n1=10, n2=10, max_attempt=5)
         stat_dict = {
             "len_input_context": len(remaining_texts),
             "len_generated": len(all_q)
@@ -181,7 +181,7 @@ def gen_a_route():
         if not user_info[user_id]["is_finished_gen_q"]:
             return jsonify({'error message': 'instructions not found'}), 400
         all_q = pd.read_csv(f"user_data/{user_id}_all_q.csv")
-        completed_df = search_for_all_queries(all_q, user_info[user_id]["query"], early_stop=3)
+        completed_df = search_for_all_queries(all_q, user_info[user_id]["query"])
         completed_df.to_csv(f"user_data/{user_id}_completed_df.csv", index=False)
         stat_dict = {
             "len_input_instructions": len(all_q),
@@ -192,6 +192,7 @@ def gen_a_route():
         else:
             top_10 = completed_df
         user_info[user_id]["is_finished_gen_a"] = True
+        print(top_10.to_dict())
         return jsonify({'user_info': user_info[user_id], 'top_10': top_10.to_dict(), 'stats': stat_dict}), 200
     except Exception as e:
         print(e)

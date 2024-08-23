@@ -184,7 +184,7 @@ class CustomGoogleSearchWrapper:
 
 def search_for_query(query, llm=None, k=10):
     if llm == None:
-        llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", max_tokens=8192, min_length=1024)
+        llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", max_tokens=8192)
     search_engine = CustomGoogleSearchWrapper(k)
     meta_data_search_tool = Tool(
         name="Google Search Snippets",
@@ -206,25 +206,25 @@ def search_for_query(query, llm=None, k=10):
     )
     attempt = 0
     while attempt < 5:
-        try:
-            res = agent.run(f"{query}. Please provide multiple perspectives and a detailed breakdown. **Don't mention that it is a search result in your response.**")
-            sources = search_engine.get_all_resources()
-            # search_engine.reset_all_resources()
-            return res, sources 
-        except:
-            print("Failed to generate, sleeping for 60 seconds")
-            time.sleep(60)
-            attempt += 1
+        # try:
+        res = agent.run(f"{query}. Please provide multiple perspectives and a detailed breakdown. **Don't mention that it is a search result in your response.**")
+        sources = search_engine.get_all_resources()
+        # search_engine.reset_all_resources()
+        return res, sources 
+        # except:
+            # print("Failed to generate, sleeping for 60 seconds")
+            # time.sleep(60)
+            # attempt += 1
     return "", []
 
 def search_for_all_queries(instruction_df, original_query, early_stop=None):
-    llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", max_tokens=8192, min_length=1024)
+    llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", max_tokens=8192)
     completed_df = pd.DataFrame(columns = ["original_context", "instruction", "response", "sources", "original_query"])
     all_contexts = list(instruction_df["text"])
     all_instructions = list(instruction_df["instruction"])
     for i in tqdm(range(len(instruction_df))):
         res, sources = search_for_query(all_instructions[i], llm)
-        if res != None and len(res) >= 500 and "action_input" not in res:
+        if res != None and len(res) >= 300 and "action_input" not in res:
             # Format results
             if "The final answer to the question is:" in res and res.index("The final answer to the question is:") == 0:
                 res = res[len("The final answer to the question is:"):].strip()
