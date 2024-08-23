@@ -184,7 +184,7 @@ class CustomGoogleSearchWrapper:
 
 def search_for_query(query, llm=None, k=10):
     if llm == None:
-        llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", max_tokens=8192)
+        llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", max_tokens=8192, min_length=1024)
     search_engine = CustomGoogleSearchWrapper(k)
     meta_data_search_tool = Tool(
         name="Google Search Snippets",
@@ -218,13 +218,13 @@ def search_for_query(query, llm=None, k=10):
     return "", []
 
 def search_for_all_queries(instruction_df, original_query):
-    llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", max_tokens=8192)
+    llm = ChatGroq(temperature=0, model_name="llama3-8b-8192", max_tokens=8192, min_length=1024)
     completed_df = pd.DataFrame(columns = ["original_context", "instruction", "response", "sources", "original_query"])
     all_contexts = list(instruction_df["text"])
     all_instructions = list(instruction_df["instruction"])
     for i in tqdm(range(len(instruction_df))):
         res, sources = search_for_query(all_instructions[i], llm)
-        if res != None and len(res) >= 80 and "action_input" not in res:
+        if res != None and len(res) >= 500 and "action_input" not in res:
             # Format results
             if "The final answer to the question is:" in res and res.index("The final answer to the question is:") == 0:
                 res = res[len("The final answer to the question is:"):].strip()
@@ -233,6 +233,7 @@ def search_for_all_queries(instruction_df, original_query):
             if "The final answer to the original input question." in res and res.index("The final answer to the original input question.") == 0:
                 res = res[len("The final answer to the original input question."):].strip()
             completed_df.loc[len(completed_df) + 1] = [all_contexts[i], all_instructions[i], res, sources, original_query]
+            completed_df = completed_df[completed_df['response'].str.len() >= 500]
     return completed_df
 
 # some utils

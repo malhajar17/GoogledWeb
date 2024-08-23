@@ -118,7 +118,7 @@ def retrieve_and_filter_route():
         if not user_info[user_id]["is_finished_submit_query"]:
             return jsonify({'error message': 'query not submitted'}), 400
         
-        remaining_texts = get_texts_by_query(user_info[user_id]['query'], 25)
+        remaining_texts = get_texts_by_query(user_info[user_id]['query'], 10)
         stat_dict = {
             "len_contexts": len(remaining_texts)
         }
