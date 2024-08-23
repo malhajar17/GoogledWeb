@@ -109,7 +109,6 @@ def retrieve_and_filter_route():
     """
     update user info, store the contexts a user generate with the query, returns user info of user_id
     """
-    print("received requests!")
     try:
         user_id = request.json.get("user_id")
 
@@ -119,7 +118,7 @@ def retrieve_and_filter_route():
         if not user_info[user_id]["is_finished_submit_query"]:
             return jsonify({'error message': 'query not submitted'}), 400
         
-        remaining_texts = get_texts_by_query(user_info[user_id]['query'], 10)
+        remaining_texts = get_texts_by_query(user_info[user_id]['query'], 5)
         print(len(remaining_texts))
         stat_dict = {
             "len_contexts": len(remaining_texts)
@@ -182,7 +181,7 @@ def gen_a_route():
         if not user_info[user_id]["is_finished_gen_q"]:
             return jsonify({'error message': 'instructions not found'}), 400
         all_q = pd.read_csv(f"user_data/{user_id}_all_q.csv")
-        completed_df = search_for_all_queries(all_q, user_info[user_id]["query"])
+        completed_df = search_for_all_queries(all_q, user_info[user_id]["query"], early_stop=3)
         completed_df.to_csv(f"user_data/{user_id}_completed_df.csv", index=False)
         stat_dict = {
             "len_input_instructions": len(all_q),
