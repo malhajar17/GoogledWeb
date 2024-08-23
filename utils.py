@@ -211,8 +211,9 @@ def search_for_query(query, llm=None, k=10):
             sources = search_engine.get_all_resources()
             # search_engine.reset_all_resources()
             return res, sources 
-        except:
+        except Exception as e:
             print("Failed to generate, sleeping for 5 seconds")
+            print(e)
             time.sleep(5)
             attempt += 1
     return "", []
@@ -224,7 +225,7 @@ def search_for_all_queries(instruction_df, original_query, early_stop=None):
     all_instructions = list(instruction_df["instruction"])
     for i in tqdm(range(len(instruction_df))):
         res, sources = search_for_query(all_instructions[i], llm)
-        if res != None and len(res) >= 300 and "action_input" not in res:
+        if res != None and len(res) >= 400 and "action_input" not in res:
             # Format results
             if "The final answer to the question is:" in res and res.index("The final answer to the question is:") == 0:
                 res = res[len("The final answer to the question is:"):].strip()
@@ -234,6 +235,7 @@ def search_for_all_queries(instruction_df, original_query, early_stop=None):
                 res = res[len("The final answer to the original input question."):].strip()
             completed_df.loc[len(completed_df) + 1] = [all_contexts[i], all_instructions[i], res, sources, original_query]
         if early_stop != None and len(completed_df) == early_stop:
+            print("early stop!!!")
             return completed_df
     return completed_df
 

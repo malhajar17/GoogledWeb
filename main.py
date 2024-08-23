@@ -181,7 +181,7 @@ def gen_a_route():
         if not user_info[user_id]["is_finished_gen_q"]:
             return jsonify({'error message': 'instructions not found'}), 400
         all_q = pd.read_csv(f"user_data/{user_id}_all_q.csv")
-        completed_df = search_for_all_queries(all_q, user_info[user_id]["query"])
+        completed_df = search_for_all_queries(all_q, user_info[user_id]["query"], early_stop=3)
         completed_df.to_csv(f"user_data/{user_id}_completed_df.csv", index=False)
         stat_dict = {
             "len_input_instructions": len(all_q),
