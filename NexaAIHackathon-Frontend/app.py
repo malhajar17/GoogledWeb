@@ -93,8 +93,8 @@ if st.button("Submit"):
                 progress.progress(20)
 
                 # Step 2: Retrieve and Filter Contexts
-                st.markdown(f"<h4>Step 2: Searching FineDweb</h4>", unsafe_allow_html=True)
-                st.info("Searching the 1T FineDWeb dataset for relevant contexts...")
+                st.markdown(f"<h4>Step 2: Searching FineWeb</h4>", unsafe_allow_html=True)
+                st.info("Searching the 50k FineWeb dataset for relevant contexts...")
                 filter_response = retrieve_and_filter(user_id)
 
                 if "error" in filter_response:

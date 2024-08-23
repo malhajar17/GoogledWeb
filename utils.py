@@ -206,15 +206,15 @@ def search_for_query(query, llm=None, k=10):
     )
     attempt = 0
     while attempt < 5:
-        # try:
-        res = agent.run(f"{query}. Please provide multiple perspectives and a detailed breakdown. **Don't mention that it is a search result in your response.**")
-        sources = search_engine.get_all_resources()
-        # search_engine.reset_all_resources()
-        return res, sources 
-        # except:
-            # print("Failed to generate, sleeping for 60 seconds")
-            # time.sleep(60)
-            # attempt += 1
+        try:
+            res = agent.run(f"{query}. Please provide multiple perspectives and a detailed breakdown. **Don't mention that it is a search result in your response.**")
+            sources = search_engine.get_all_resources()
+            # search_engine.reset_all_resources()
+            return res, sources 
+        except:
+            print("Failed to generate, sleeping for 5 seconds")
+            time.sleep(5)
+            attempt += 1
     return "", []
 
 def search_for_all_queries(instruction_df, original_query, early_stop=None):
