@@ -109,6 +109,7 @@ def retrieve_and_filter_route():
     """
     update user info, store the contexts a user generate with the query, returns user info of user_id
     """
+    print("received requests!")
     try:
         user_id = request.json.get("user_id")
 
@@ -119,6 +120,7 @@ def retrieve_and_filter_route():
             return jsonify({'error message': 'query not submitted'}), 400
         
         remaining_texts = get_texts_by_query(user_info[user_id]['query'], 10)
+        print(len(remaining_texts))
         stat_dict = {
             "len_contexts": len(remaining_texts)
         }
